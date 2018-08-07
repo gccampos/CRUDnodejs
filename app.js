@@ -1,13 +1,13 @@
 var express = require('express')
 var app = express()
-var myConnection  = require('express-myconnection')
+var myConnection = require('express-myconnection')
 var config = require('./config')
 var mysql = require('mysql')
 var dbOptions = {
-	host:      config.database.host,
-	user:       config.database.user,
+	host: config.database.host,
+	user: config.database.user,
 	password: config.database.password,
-	port:       config.database.port, 
+	port: config.database.port,
 	database: config.database.db
 }
 var index = require('./routes/index')
@@ -31,14 +31,19 @@ app.use(methodOverride(function (req, res) {
 		return method
 	}
 }))
+app.use(bodyParser.urlencoded({
+	extended: true
+}))
 
 app.use(cookieParser('keyboard cat'))
 
-app.use(session({ 
+app.use(session({
 	secret: 'keyboard cat',
 	resave: false,
 	saveUninitialized: true,
-	cookie: { maxAge: 60000 }
+	cookie: {
+		maxAge: 60000
+	}
 }))
 
 app.use(flash())
@@ -47,6 +52,6 @@ app.use('/', index)
 
 app.use('/users', users)
 
-app.listen(3000, function(){
+app.listen(3000, function () {
 	console.log('Server running at port 3000: http://127.0.0.1:3000')
 })

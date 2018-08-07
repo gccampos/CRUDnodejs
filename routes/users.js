@@ -1,5 +1,10 @@
 var express = require('express')
 var app = express()
+var bodyParser = require('body-parser')
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 // SHOW LIST OF USERS
 app.get('/', function (req, res, next) {
@@ -35,12 +40,12 @@ app.get('/add', function (req, res, next) {
 })
 
 // ADD NEW USER POST ACTION
-app.post('/add',(req, res, next) => {
+app.post('/add', function (req, res, next) {
     req.assert('name', 'Name is required').notEmpty() //Validate name
     req.assert('age', 'Age is required').notEmpty() //Validate age
     req.assert('email', 'A valid email is required').isEmail() //Validate email
 
-    var errors = req.validationErrors();
+    var errors = req.validationErrors()
 
     if (!errors) { //No errors were found.  Passed Validation!
 
@@ -53,17 +58,16 @@ app.post('/add',(req, res, next) => {
         req.sanitize('comment').escape(); // returns 'a &lt;span&gt;comment&lt;/span&gt;'
         req.sanitize('username').trim(); // returns 'a user'
         ********************************************/
-       var user = {
-        name: req.sanitize('name').escape().trim(),
-        age: req.sanitize('age').trim(),
-        email: req.sanitize('email').trim()
-    }
+        var user = {
+            name: req.sanitize('name').escape().trim(),
+            age: req.sanitize('age').escape().trim(),
+            email: req.sanitize('email').escape().trim()
+        }
 
         req.getConnection(function (error, conn) {
             conn.query('INSERT INTO users SET ?', user, function (err, result) {
                 //if(err) throw err
                 if (err) {
-                    console.log('erro aqui!');
                     req.flash('error', err)
 
                     // render to views/user/add.ejs
