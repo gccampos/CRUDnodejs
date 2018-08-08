@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({
 // SHOW LIST OF USERS
 app.get('/', function (req, res, next) {
     req.getConnection(function (error, conn) {
-        conn.query('SELECT * FROM users ORDER BY id DESC', function (err, rows, fields) {
+        conn.query('SELECT * FROM users ORDER BY id ASC', function (err, rows, fields) {
             //if(err) throw err
             if (err) {
                 req.flash('error', err)
@@ -66,7 +66,7 @@ app.post('/add', function (req, res, next) {
 
         req.getConnection(function (error, conn) {
             conn.query('INSERT INTO users SET ?', user, function (err, result) {
-                //if(err) throw err
+                //if(err) throw err?
                 if (err) {
                     req.flash('error', err)
 
@@ -136,7 +136,7 @@ app.get('/edit/(:id)', function (req, res, next) {
 })
 
 // EDIT USER POST ACTION
-app.put('/edit/(:id)', function (req, res, next) {
+app.post('/edit/(:id)', function (req, res, next) {
     req.assert('name', 'Name is required').notEmpty() //Validate name
     req.assert('age', 'Age is required').notEmpty() //Validate age
     req.assert('email', 'A valid email is required').isEmail() //Validate email
@@ -162,7 +162,7 @@ app.put('/edit/(:id)', function (req, res, next) {
 
         req.getConnection(function (error, conn) {
             conn.query('UPDATE users SET ? WHERE id = ' + req.params.id, user, function (err, result) {
-                //if(err) throw err
+                if (err) throw err;
                 if (err) {
                     req.flash('error', err)
 
@@ -176,15 +176,8 @@ app.put('/edit/(:id)', function (req, res, next) {
                     })
                 } else {
                     req.flash('success', 'Data updated successfully!')
-
-                    // render to views/user/add.ejs
-                    res.render('user/edit', {
-                        title: 'Edit User',
-                        id: req.params.id,
-                        name: req.body.name,
-                        age: req.body.age,
-                        email: req.body.email
-                    })
+                    // redirect to users list page
+                    res.redirect('/users')
                 }
             })
         })
@@ -210,7 +203,7 @@ app.put('/edit/(:id)', function (req, res, next) {
 })
 
 // DELETE USER
-app.delete('/delete/(:id)', function (req, res, next) {
+app.post('/delete/(:id)', function (req, res, next) {
     var user = {
         id: req.params.id
     }
